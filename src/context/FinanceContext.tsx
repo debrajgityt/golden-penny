@@ -52,6 +52,7 @@ interface FinanceContextType {
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   loginWithGoogle: () => void;
   loginWithEmail: (email: string) => string; // returns mock otp code
+  signupWithEmail: (name: string, email: string, password: string) => string; // create account, returns otp
   verifyEmailOtp: (email: string, code: string) => boolean;
   logout: () => void;
 
@@ -372,11 +373,23 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const loginWithEmail = (email: string) => {
-    const mockCode = '492810';
+    const mockCode = Math.floor(100000 + Math.random() * 900000).toString();
     setUser({
-      name: email.split('@')[0] || 'Debraj Bhowmick',
+      name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'User',
       email,
-      avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBithLGA1M436N_jIuqPXRQlB2iV0JL9tHOR-9sA-73-ljYYeqMXyZkan9uMcnejXlI12S9BioB2JpVImUyD2kunfCfZW1SKWKEBZVdE9RVB9WYTQVrbf7z0KRwMowDWPf7ed2dQ58rNafgAOZe4lLAm51v0q_LHK-OB-LCDJMVUllyhafJ7Ka68h64ebuVkFL9HeDuLMPJQ544mm-8ua1LsmWrsMZwsS6ZaCNytsIO_CsMw3jwo09Q',
+      avatar: '',
+      isVerified: false,
+      authMethod: 'email',
+    });
+    return mockCode;
+  };
+
+  const signupWithEmail = (name: string, email: string, _password: string) => {
+    const mockCode = Math.floor(100000 + Math.random() * 900000).toString();
+    setUser({
+      name: name || email.split('@')[0],
+      email,
+      avatar: '',
       isVerified: false,
       authMethod: 'email',
     });
@@ -384,7 +397,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const verifyEmailOtp = (_email: string, code: string) => {
-    if (code === '492810' || code.length === 6) {
+    if (code.length === 6) {
       setUser((prev) => ({ ...prev, isVerified: true }));
       return true;
     }
@@ -399,6 +412,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       isVerified: false,
       authMethod: 'guest',
     });
+    // Reopen auth modal so user sees Sign In screen (not silent guest mode)
+    setIsAuthModalOpen(true);
   };
 
   // Metrics calculations
@@ -668,6 +683,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
         updateUserProfile,
         loginWithGoogle,
         loginWithEmail,
+        signupWithEmail,
         verifyEmailOtp,
         logout,
 
