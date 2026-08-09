@@ -4,6 +4,7 @@ import { Sidebar } from './components/common/Sidebar';
 import { Header } from './components/common/Header';
 import { ModalsContainer } from './components/common/Modals';
 import { AuthModal } from './components/common/AuthModal';
+import { AuthGate } from './components/common/AuthGate';
 
 import { OverviewScreen } from './components/dashboard/OverviewScreen';
 import { TransactionsScreen } from './components/transactions/TransactionsScreen';
@@ -17,33 +18,31 @@ import { AlertsScreen } from './components/alerts/AlertsScreen';
 import { UserGuideScreen } from './components/guide/UserGuideScreen';
 
 const MainContent: React.FC = () => {
-  const { activeTab } = useFinance();
+  const { activeTab, user } = useFinance();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // ── AUTH GATE ──────────────────────────────────────────────────────────────
+  // When the user is not authenticated, render the full-screen login page.
+  // The dashboard is completely hidden — no data is visible to unauthenticated
+  // visitors. The AuthGate has no dismiss/close button.
+  if (user.authMethod === 'guest') {
+    return <AuthGate />;
+  }
+  // ──────────────────────────────────────────────────────────────────────────
 
   const renderScreen = () => {
     switch (activeTab) {
-      case 'overview':
-        return <OverviewScreen />;
-      case 'accounts':
-        return <AccountsScreen />;
-      case 'transactions':
-        return <TransactionsScreen />;
-      case 'bills':
-        return <BillsScreen />;
-      case 'budgets':
-        return <BudgetsScreen />;
-      case 'investments':
-        return <InvestmentsScreen />;
-      case 'alerts':
-        return <AlertsScreen />;
-      case 'guide':
-        return <UserGuideScreen />;
-      case 'ai':
-        return <AiAssistantScreen />;
-      case 'settings':
-        return <SettingsScreen />;
-      default:
-        return <OverviewScreen />;
+      case 'overview':      return <OverviewScreen />;
+      case 'accounts':      return <AccountsScreen />;
+      case 'transactions':  return <TransactionsScreen />;
+      case 'bills':         return <BillsScreen />;
+      case 'budgets':       return <BudgetsScreen />;
+      case 'investments':   return <InvestmentsScreen />;
+      case 'alerts':        return <AlertsScreen />;
+      case 'guide':         return <UserGuideScreen />;
+      case 'ai':            return <AiAssistantScreen />;
+      case 'settings':      return <SettingsScreen />;
+      default:              return <OverviewScreen />;
     }
   };
 
@@ -62,6 +61,8 @@ const MainContent: React.FC = () => {
 
       {/* Modals Layer */}
       <ModalsContainer />
+      {/* AuthModal: only used when logged-in user clicks their profile avatar
+          (shows profile card + sign-out button). */}
       <AuthModal />
     </div>
   );

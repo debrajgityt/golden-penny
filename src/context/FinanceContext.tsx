@@ -412,8 +412,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       isVerified: false,
       authMethod: 'guest',
     });
-    // Reopen auth modal so user sees Sign In screen (not silent guest mode)
-    setIsAuthModalOpen(true);
+    // App.tsx detects authMethod === 'guest' and renders <AuthGate /> automatically.
+    // No need to open a modal here.
+    setIsAuthModalOpen(false);
   };
 
   // Metrics calculations
