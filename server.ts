@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { GoogleGenAI } from '@google/genai';
-import { createServer as createViteServer } from 'vite';
+// vite is loaded dynamically only in development (not imported at top level)
 
 async function startServer() {
   const app = express();
@@ -150,6 +150,8 @@ Keep responses structured, friendly, direct, and under 150 words. Focus on pract
 
   // Vite middleware setup
   if (process.env.NODE_ENV !== 'production') {
+    // Dynamic import: vite is a devDependency — only load in dev mode
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
